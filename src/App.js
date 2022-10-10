@@ -4,9 +4,18 @@ import { useState, useEffect } from "react";
 import List from "./components/List";
 import { v4 as uuidv4 } from "uuid";
 
+const getLocalStorage = () => {
+  let items = localStorage.getItem("items");
+  if (items) {
+    return JSON.parse(localStorage.getItem("items"));
+  } else {
+    return [];
+  }
+};
+
 function App() {
   const [text, setText] = useState("");
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState(getLocalStorage());
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -18,9 +27,18 @@ function App() {
     setText("");
   };
 
+  const handleDelete = (id) => {
+    setItems(items.filter((item) => item.id !== id));
+  };
+
   useEffect(() => {
-    console.log(items);
+    // everytime items change, local storage is updated
+    localStorage.setItem("items", JSON.stringify(items));
   }, [items]);
+
+  // useEffect(() => {
+  //   console.log(items);
+  // }, [items]);
   return (
     <>
       <main>
@@ -42,7 +60,7 @@ function App() {
             }}
           />
         </form>
-        <List items={items} setItems={setItems} />
+        <List items={items} setItems={setItems} handleDelete={handleDelete} />
       </main>
     </>
   );
